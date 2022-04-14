@@ -19,9 +19,9 @@ const {getBaseArtifacts, finalizeArtifacts} = require('./base-artifacts.js');
 
 /**
  * @param {{page: import('puppeteer').Page, config?: LH.Config.Json, configContext?: LH.Config.FRContext}} options
- * @return {Promise<{endTimespan(): Promise<LH.RunnerResult|undefined>}>}
+ * @return {Promise<{endTimespanGather(): Promise<LH.Gatherer.FRGatherResult>}>}
  */
-async function startTimespan(options) {
+async function startTimespanGather(options) {
   const {configContext = {}} = options;
   log.setLevel(configContext.logLevel || 'error');
 
@@ -32,12 +32,11 @@ async function startTimespan(options) {
   /** @type {Map<string, LH.ArbitraryEqualityMap>} */
   const computedCache = new Map();
   const artifactDefinitions = config.artifacts || [];
-  const requestedUrl = await driver.url();
+  const initialUrl = await driver.url();
   const baseArtifacts = await getBaseArtifacts(config, driver, {gatherMode: 'timespan'});
   const artifactState = getEmptyArtifactState();
   /** @type {Omit<import('./runner-helpers.js').CollectPhaseArtifactOptions, 'phase'>} */
   const phaseOptions = {
-    url: requestedUrl,
     driver,
     artifactDefinitions,
     artifactState,
@@ -52,15 +51,16 @@ async function startTimespan(options) {
   await collectPhaseArtifacts({phase: 'startSensitiveInstrumentation', ...phaseOptions});
 
   return {
-    async endTimespan() {
+    async endTimespanGather() {
       const finalUrl = await driver.url();
-      phaseOptions.url = finalUrl;
 
       const runnerOptions = {config, computedCache};
       const artifacts = await Runner.gather(
         async () => {
-          baseArtifacts.URL.requestedUrl = requestedUrl;
-          baseArtifacts.URL.finalUrl = finalUrl;
+          baseArtifacts.URL = {
+            initialUrl,
+            finalUrl,
+          };
 
           await collectPhaseArtifacts({phase: 'stopSensitiveInstrumentation', ...phaseOptions});
           await collectPhaseArtifacts({phase: 'stopInstrumentation', ...phaseOptions});
@@ -72,11 +72,11 @@ async function startTimespan(options) {
         },
         runnerOptions
       );
-      return Runner.audit(artifacts, runnerOptions);
+      return {artifacts, runnerOptions};
     },
   };
 }
 
 module.exports = {
-  startTimespan,
+  startTimespanGather,
 };

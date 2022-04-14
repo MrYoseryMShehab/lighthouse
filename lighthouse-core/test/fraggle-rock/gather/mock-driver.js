@@ -145,6 +145,7 @@ function createMockDriver() {
 
 function mockRunnerModule() {
   const runnerModule = {
+    getAuditList: jest.fn().mockReturnValue([]),
     getGathererList: jest.fn().mockReturnValue([]),
     audit: jest.fn(),
     gather: jest.fn(),
@@ -155,6 +156,7 @@ function mockRunnerModule() {
 
   function reset() {
     runnerModule.getGathererList.mockReturnValue([]);
+    runnerModule.getAuditList.mockReturnValue([]);
     runnerModule.audit.mockReset();
     runnerModule.gather.mockReset();
   }
@@ -177,7 +179,12 @@ function mockDriverModule(driverProvider) {
 function createMockBaseArtifacts() {
   return {
     fetchTime: new Date().toISOString(),
-    URL: {finalUrl: 'https://example.com', requestedUrl: 'https://example.com'},
+    URL: {
+      initialUrl: 'about:blank',
+      requestedUrl: 'https://example.com',
+      mainDocumentUrl: 'https://example.com',
+      finalUrl: 'https://example.com',
+    },
     PageLoadError: null,
     settings: defaultSettings,
     BenchmarkIndex: 500,

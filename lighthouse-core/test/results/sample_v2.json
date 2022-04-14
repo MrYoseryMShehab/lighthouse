@@ -1,5 +1,5 @@
 {
-  "lighthouseVersion": "9.4.0",
+  "lighthouseVersion": "9.5.0",
   "requestedUrl": "http://localhost:10200/dobetterweb/dbw_tester.html",
   "finalUrl": "http://localhost:10200/dobetterweb/dbw_tester.html",
   "fetchTime": "2021-09-07T20:11:11.853Z",
@@ -799,7 +799,7 @@
         ],
         "items": [
           {
-            "reason": "No manifest was fetched"
+            "reason": "Page has no manifest <link> URL"
           }
         ],
         "debugData": {
@@ -2533,7 +2533,7 @@
     "preload-lcp-image": {
       "id": "preload-lcp-image",
       "title": "Preload Largest Contentful Paint image",
-      "description": "Preload the image used by the LCP element in order to improve your LCP time. [Learn more](https://web.dev/optimize-lcp/#preload-important-resources).",
+      "description": "If the LCP element is dynamically added to the page, you should preload the image in order to improve LCP. [Learn more](https://web.dev/optimize-lcp/#preload-important-resources).",
       "score": 1,
       "scoreDisplayMode": "numeric",
       "numericValue": 0,
@@ -3232,7 +3232,75 @@
         "nodes": [
           {
             "name": "http://localhost:10200/dobetterweb/dbw_tester.html",
-            "resourceBytes": 7197
+            "resourceBytes": 7166,
+            "unusedBytes": 937,
+            "children": [
+              {
+                "name": "(inline) setTimeout(() =…",
+                "resourceBytes": 274,
+                "unusedBytes": 0
+              },
+              {
+                "name": "(inline) this.rel = 'sty…",
+                "resourceBytes": 23,
+                "unusedBytes": 0
+              },
+              {
+                "name": "(inline) throw new Error…",
+                "resourceBytes": 39,
+                "unusedBytes": 0
+              },
+              {
+                "name": "(inline) throw new Error…",
+                "resourceBytes": 36,
+                "unusedBytes": 0
+              },
+              {
+                "name": "(inline) setTimeout(() =…",
+                "resourceBytes": 194,
+                "unusedBytes": 0
+              },
+              {
+                "name": "(inline) // DOM Size has…",
+                "resourceBytes": 434,
+                "unusedBytes": 0
+              },
+              {
+                "name": "(inline) // Ensure gathe…",
+                "resourceBytes": 480,
+                "unusedBytes": 0
+              },
+              {
+                "name": "(inline) window.Error = …",
+                "resourceBytes": 62,
+                "unusedBytes": 46
+              },
+              {
+                "name": "(inline) window.confirm(…",
+                "resourceBytes": 51,
+                "unusedBytes": 0
+              },
+              {
+                "name": "(inline) function stampT…",
+                "resourceBytes": 5060,
+                "unusedBytes": 847
+              },
+              {
+                "name": "(inline) window.fetch = …",
+                "resourceBytes": 60,
+                "unusedBytes": 44
+              },
+              {
+                "name": "(inline) function onInit…",
+                "resourceBytes": 373,
+                "unusedBytes": 0
+              },
+              {
+                "name": "(inline) // Log console.…",
+                "resourceBytes": 80,
+                "unusedBytes": 0
+              }
+            ]
           },
           {
             "name": "http://localhost:10200/dobetterweb/dbw_tester.js",
@@ -3241,15 +3309,7 @@
           },
           {
             "name": "http://localhost:10200/dobetterweb/empty_module.js?delay=500",
-            "resourceBytes": 60
-          },
-          {
-            "name": "http://localhost:10200/dobetterweb/fake-script-wp-includes",
-            "resourceBytes": 58
-          },
-          {
-            "name": "http://localhost:10200/dobetterweb/fcp-delayer.js?delay=5000",
-            "resourceBytes": 60
+            "resourceBytes": 0
           },
           {
             "name": "http://localhost:10200/dobetterweb/third_party/aggressive-promise-polyfill.js",
@@ -7773,12 +7833,6 @@
       },
       {
         "startTime": 0,
-        "name": "lh:computed:ManifestValues",
-        "duration": 100,
-        "entryType": "measure"
-      },
-      {
-        "startTime": 0,
         "name": "lh:audit:apple-touch-icon",
         "duration": 100,
         "entryType": "measure"
@@ -7786,6 +7840,12 @@
       {
         "startTime": 0,
         "name": "lh:audit:splash-screen",
+        "duration": 100,
+        "entryType": "measure"
+      },
+      {
+        "startTime": 0,
+        "name": "lh:computed:ManifestValues",
         "duration": 100,
         "entryType": "measure"
       },
@@ -8038,6 +8098,84 @@
       {
         "startTime": 0,
         "name": "lh:computed:ModuleDuplication",
+        "duration": 100,
+        "entryType": "measure"
+      },
+      {
+        "startTime": 0,
+        "name": "lh:computed:UnusedJavascriptSummary",
+        "duration": 100,
+        "entryType": "measure"
+      },
+      {
+        "startTime": 0,
+        "name": "lh:computed:UnusedJavascriptSummary",
+        "duration": 100,
+        "entryType": "measure"
+      },
+      {
+        "startTime": 0,
+        "name": "lh:computed:UnusedJavascriptSummary",
+        "duration": 100,
+        "entryType": "measure"
+      },
+      {
+        "startTime": 0,
+        "name": "lh:computed:UnusedJavascriptSummary",
+        "duration": 100,
+        "entryType": "measure"
+      },
+      {
+        "startTime": 0,
+        "name": "lh:computed:UnusedJavascriptSummary",
+        "duration": 100,
+        "entryType": "measure"
+      },
+      {
+        "startTime": 0,
+        "name": "lh:computed:UnusedJavascriptSummary",
+        "duration": 100,
+        "entryType": "measure"
+      },
+      {
+        "startTime": 0,
+        "name": "lh:computed:UnusedJavascriptSummary",
+        "duration": 100,
+        "entryType": "measure"
+      },
+      {
+        "startTime": 0,
+        "name": "lh:computed:UnusedJavascriptSummary",
+        "duration": 100,
+        "entryType": "measure"
+      },
+      {
+        "startTime": 0,
+        "name": "lh:computed:UnusedJavascriptSummary",
+        "duration": 100,
+        "entryType": "measure"
+      },
+      {
+        "startTime": 0,
+        "name": "lh:computed:UnusedJavascriptSummary",
+        "duration": 100,
+        "entryType": "measure"
+      },
+      {
+        "startTime": 0,
+        "name": "lh:computed:UnusedJavascriptSummary",
+        "duration": 100,
+        "entryType": "measure"
+      },
+      {
+        "startTime": 0,
+        "name": "lh:computed:UnusedJavascriptSummary",
+        "duration": 100,
+        "entryType": "measure"
+      },
+      {
+        "startTime": 0,
+        "name": "lh:computed:UnusedJavascriptSummary",
         "duration": 100,
         "entryType": "measure"
       },
@@ -8470,12 +8608,6 @@
       {
         "startTime": 0,
         "name": "lh:audit:unused-javascript",
-        "duration": 100,
-        "entryType": "measure"
-      },
-      {
-        "startTime": 0,
-        "name": "lh:computed:UnusedJavascriptSummary",
         "duration": 100,
         "entryType": "measure"
       },
@@ -9019,6 +9151,9 @@
       ],
       "lighthouse-core/audits/installable-manifest.js | columnValue": [
         "audits[installable-manifest].details.headings[0].text"
+      ],
+      "lighthouse-core/audits/installable-manifest.js | no-manifest": [
+        "audits[installable-manifest].details.items[0].reason"
       ],
       "lighthouse-core/audits/apple-touch-icon.js | failureTitle": [
         "audits[apple-touch-icon].title"
