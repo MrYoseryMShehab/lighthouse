@@ -110,12 +110,19 @@ async function buildUmdBundle() {
   const bundle = await rollup.rollup({
     input: 'report/clients/bundle.js',
     plugins: [
+      rollupPlugins.inlineFs({verbose: true}),
       rollupPlugins.commonjs(),
       rollupPlugins.terser({
         format: {
           beautify: true,
         },
       }),
+      // Shim this empty to ensure the bundle isn't 10MB
+      rollupPlugins.shim({
+        [`${LH_ROOT}/shared/localization/locales.js`]: 'export default {}',
+        'fs': 'export default {}',
+      }),
+      rollupPlugins.nodeResolve({preferBuiltins: true}),
     ],
   });
 

@@ -17,14 +17,22 @@ const wait = (ms = 100) => new Promise(resolve => setTimeout(resolve, ms));
 (async function __initPsiReports__() {
   renderLHReport();
 
-  document.querySelector('button')?.addEventListener('click', () => {
+  document.querySelector('button#reanalyze')?.addEventListener('click', () => {
     renderLHReport();
+  });
+
+  document.querySelector('button#translate')?.addEventListener('click', async () => {
+    const lhr = await _swapLocale('es');
+    renderLHReport(lhr);
   });
 })();
 
-async function renderLHReport() {
+/**
+ * @param {LH.Result=} lhr
+ */
+async function renderLHReport(lhr) {
   // @ts-expect-error
-  const mobileLHR = window.__LIGHTHOUSE_JSON__;
+  const mobileLHR = lhr || window.__LIGHTHOUSE_JSON__;
   const desktopLHR = JSON.parse(JSON.stringify(mobileLHR));
 
   const lhrs = {
@@ -78,6 +86,31 @@ async function renderLHReport() {
       container.textContent = 'Error: LHR failed to render.';
     }
   }
+}
+
+// cd ~/code/lighthouse/shared/localization && statikk --cors
+// http://localhost:7076/locales/es.json
+
+/**
+ * @param {LH.Locale} locale
+ * @return {Promise<import('../../shared/localization/locales').LhlMessages>}
+ */
+async function _fetchLocaleMessages(locale) {
+  const response = await fetch(`http://localhost:7076/locales/${locale}.json`);
+  return response.json();
+}
+
+/**
+ * @param {LH.Locale} locale
+ */
+async function _swapLocale(locale) {
+  const lhlMessages = await _fetchLocaleMessages(locale);
+  if (!lhlMessages) throw new Error(`could not fetch data for locale: ${locale}`);
+
+  lighthouseRenderer.format.registerLocaleData(locale, lhlMessages);
+  // @ts-expect-error
+  const newLhr = lighthouseRenderer.swapLocale(window.__LIGHTHOUSE_JSON__, locale).lhr;
+  return newLhr;
 }
 
 
