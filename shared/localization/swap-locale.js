@@ -5,7 +5,9 @@
  */
 'use strict';
 
-const {set: _set, get: _get} = require('lodash');
+// Using these rather than the full 'lodash' saves 134kb to the report/bundle.umd.js
+const _get = require('lodash.get');
+const _set = require('lodash.set');
 
 const format = require('./format.js');
 
