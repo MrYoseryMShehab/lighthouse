@@ -22,7 +22,7 @@ const wait = (ms = 100) => new Promise(resolve => setTimeout(resolve, ms));
   });
 
   document.querySelector('button#translate')?.addEventListener('click', async () => {
-    await _swapLocale('es');
+    await swapLhrLocale('es');
     renderLHReport();
   });
 })();
@@ -85,30 +85,20 @@ async function renderLHReport() {
   }
 }
 
-// cd ~/code/lighthouse/shared/localization && statikk --cors
-// http://localhost:7076/locales/es.json
-
-/**
- * @param {LH.Locale} locale
- * @return {Promise<import('../../shared/localization/locales').LhlMessages>}
- */
-async function _fetchLocaleMessages(locale) {
-  const response = await fetch(`http://localhost:7076/locales/${locale}.json`);
-  return response.json();
-}
-
 /**
  * @param {LH.Locale} locale
  */
-async function _swapLocale(locale) {
-  const lhlMessages = await _fetchLocaleMessages(locale);
+async function swapLhrLocale(locale) {
+  const response = await fetch(`https://www.gstatic.com/pagespeed/insights/ui/locales/${locale}.json`);
+  /** @type {import('../../shared/localization/locales').LhlMessages} */
+  const lhlMessages = await response.json();
+  console.log(lhlMessages);
   if (!lhlMessages) throw new Error(`could not fetch data for locale: ${locale}`);
 
   lighthouseRenderer.format.registerLocaleData(locale, lhlMessages);
-  // @ts-expect-error
-  const newLhr = lighthouseRenderer.swapLocale(window.__LIGHTHOUSE_JSON__, locale).lhr;
-  // @ts-expect-error
-  window.__LIGHTHOUSE_JSON__ = newLhr;
+  // @ts-expect-error LHR global
+  window.__LIGHTHOUSE_JSON__ = lighthouseRenderer.swapLocale(window.__LIGHTHOUSE_JSON__, locale)
+    .lhr;
 }
 
 
