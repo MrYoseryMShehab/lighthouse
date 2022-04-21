@@ -22,17 +22,14 @@ const wait = (ms = 100) => new Promise(resolve => setTimeout(resolve, ms));
   });
 
   document.querySelector('button#translate')?.addEventListener('click', async () => {
-    const lhr = await _swapLocale('es');
-    renderLHReport(lhr);
+    await _swapLocale('es');
+    renderLHReport();
   });
 })();
 
-/**
- * @param {LH.Result=} lhr
- */
-async function renderLHReport(lhr) {
+async function renderLHReport() {
   // @ts-expect-error
-  const mobileLHR = lhr || window.__LIGHTHOUSE_JSON__;
+  const mobileLHR = window.__LIGHTHOUSE_JSON__;
   const desktopLHR = JSON.parse(JSON.stringify(mobileLHR));
 
   const lhrs = {
@@ -110,7 +107,8 @@ async function _swapLocale(locale) {
   lighthouseRenderer.format.registerLocaleData(locale, lhlMessages);
   // @ts-expect-error
   const newLhr = lighthouseRenderer.swapLocale(window.__LIGHTHOUSE_JSON__, locale).lhr;
-  return newLhr;
+  // @ts-expect-error
+  window.__LIGHTHOUSE_JSON__ = newLhr;
 }
 
 

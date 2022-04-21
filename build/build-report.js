@@ -130,6 +130,7 @@ async function buildUmdBundle() {
     file: 'dist/report/bundle.umd.js',
     format: 'umd',
     name: 'report',
+    sourcemap: Boolean(process.env.DEBUG),
   });
   await bundle.close();
 }

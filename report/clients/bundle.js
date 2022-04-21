@@ -15,4 +15,11 @@ export {DOM} from '../renderer/dom.js';
 export {ReportRenderer} from '../renderer/report-renderer.js';
 export {ReportUIFeatures} from '../renderer/report-ui-features.js';
 export {renderReport} from '../renderer/api.js';
+
+// This import adds 189K. (I think we're pulling extra stuff from lodash we dont want......)
 export {swapLocale, format} from '../../shared/localization/i18n-module';
+
+
+// import {set as _set} from 'lodash';
+// import {get as _get} from 'lodash';
+// export {_get, _set};
