@@ -332,7 +332,7 @@ describe('CriticalRequestChain computed artifact', () => {
     });
   });
 
-  it('discards datauris as non-critical', async () => {
+  it('discards data urls at the end of the chain', async () => {
     const {networkRecords, criticalChains} = await createChainsFromMockRecords(
       [HIGH, HIGH, HIGH, HIGH],
       // (0) main document ->
