@@ -46,6 +46,8 @@ describe('ReportRendererAxe', () => {
           'heading-order': {enabled: true},
           'meta-viewport': {enabled: true},
           'aria-treeitem-name': {enabled: true},
+          // TODO: re-enable. https://github.com/GoogleChrome/lighthouse/issues/13918
+          'color-contrast': {enabled: false},
         },
       };
 
