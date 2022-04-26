@@ -1,5 +1,5 @@
 /**
- * @license Copyright 2019 Google Inc. All Rights Reserved.
+ * @license Copyright 2019 The Lighthouse Authors. All Rights Reserved.
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
  */
@@ -9,7 +9,7 @@ const Audit = require('./audit.js');
 const MainThreadTasksComputed = require('../computed/main-thread-tasks.js');
 const NetworkRecordsComputed = require('../computed/network-records.js');
 const NetworkAnalysisComputed = require('../computed/network-analysis.js');
-const NetworkAnalyzer = require('../lib/dependency-graph/simulator/network-analyzer.js');
+const MainResource = require('../computed/main-resource.js');
 
 class Diagnostics extends Audit {
   /**
@@ -21,7 +21,8 @@ class Diagnostics extends Audit {
       scoreDisplayMode: Audit.SCORING_MODES.INFORMATIVE,
       title: 'Diagnostics',
       description: 'Collection of useful page vitals.',
-      requiredArtifacts: ['traces', 'devtoolsLogs'],
+      supportedModes: ['navigation'],
+      requiredArtifacts: ['URL', 'traces', 'devtoolsLogs'],
     };
   }
 
@@ -36,9 +37,10 @@ class Diagnostics extends Audit {
     const tasks = await MainThreadTasksComputed.request(trace, context);
     const records = await NetworkRecordsComputed.request(devtoolsLog, context);
     const analysis = await NetworkAnalysisComputed.request(devtoolsLog, context);
+    const mainResource = await MainResource.request({devtoolsLog, URL: artifacts.URL}, context);
 
     const toplevelTasks = tasks.filter(t => !t.parent);
-    const mainDocumentTransferSize = NetworkAnalyzer.findMainDocument(records).transferSize;
+    const mainDocumentTransferSize = mainResource.transferSize;
     const totalByteWeight = records.reduce((sum, r) => sum + (r.transferSize || 0), 0);
     const totalTaskTime = toplevelTasks.reduce((sum, t) => sum + (t.duration || 0), 0);
     const maxRtt = Math.max(...analysis.additionalRttByOrigin.values()) + analysis.rtt;

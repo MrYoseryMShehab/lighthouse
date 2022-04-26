@@ -1,12 +1,11 @@
 /**
- * @license Copyright 2018 Google Inc. All Rights Reserved.
+ * @license Copyright 2018 The Lighthouse Authors. All Rights Reserved.
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
  */
 'use strict';
 
 const INITIAL_CWD = 14 * 1024;
-const NetworkRequest = require('../../network-request.js');
 const URL = require('../../url-shim.js');
 
 // Assume that 40% of TTFB was server response time by default for static assets
@@ -15,7 +14,7 @@ const DEFAULT_SERVER_RESPONSE_PERCENTAGE = 0.4;
 /**
  * For certain resource types, server response time takes up a greater percentage of TTFB (dynamic
  * assets like HTML documents, XHR/API calls, etc)
- * @type {Partial<Record<LH.Crdp.Page.ResourceType, number>>}
+ * @type {Partial<Record<LH.Crdp.Network.ResourceType, number>>}
  */
 const SERVER_RESPONSE_PERCENTAGE_OF_TTFB = {
   Document: 0.9,
@@ -198,8 +197,9 @@ class NetworkAnalyzer {
       if (!Number.isFinite(timing.receiveHeadersEnd) || timing.receiveHeadersEnd < 0) return;
       if (!record.resourceType) return;
 
-      const serverResponseTimePercentage = SERVER_RESPONSE_PERCENTAGE_OF_TTFB[record.resourceType]
-        || DEFAULT_SERVER_RESPONSE_PERCENTAGE;
+      const serverResponseTimePercentage =
+        SERVER_RESPONSE_PERCENTAGE_OF_TTFB[record.resourceType] ||
+        DEFAULT_SERVER_RESPONSE_PERCENTAGE;
       const estimatedServerResponseTime = timing.receiveHeadersEnd * serverResponseTimePercentage;
 
       // When connection was reused...
@@ -268,7 +268,6 @@ class NetworkAnalyzer {
 
     // Check if we can trust the connection information coming from the protocol
     if (!forceCoarseEstimates && NetworkAnalyzer.canTrustConnectionInformation(records)) {
-      // @ts-ignore
       return new Map(records.map(record => [record.requestId, !!record.connectionReused]));
     }
 
@@ -390,7 +389,7 @@ class NetworkAnalyzer {
     // downloading those bytes. We slice up all the network records into start/end boundaries, so
     // it's easier to deal with the gaps in downloading.
     const timeBoundaries = networkRecords.reduce((boundaries, record) => {
-      const scheme = record.parsedURL && record.parsedURL.scheme;
+      const scheme = record.parsedURL?.scheme;
       // Requests whose bodies didn't come over the network or didn't completely finish will mess
       // with the computation, just skip over them.
       if (scheme === 'data' || record.failed || !record.finished ||
@@ -434,24 +433,27 @@ class NetworkAnalyzer {
 
   /**
    * @param {Array<LH.Artifacts.NetworkRequest>} records
-   * @param {string} [finalURL]
+   * @param {string} resourceUrl
+   * @return {LH.Artifacts.NetworkRequest|undefined}
+   */
+  static findResourceForUrl(records, resourceUrl) {
+    // equalWithExcludedFragments is expensive, so check that the resourceUrl starts with the request url first
+    return records.find(request =>
+      resourceUrl.startsWith(request.url) &&
+      URL.equalWithExcludedFragments(request.url, resourceUrl)
+    );
+  }
+
+  /**
+   * Resolves redirect chain given a main document.
+   * See: {@link NetworkAnalyzer.findResourceForUrl}) for how to retrieve main document.
+   *
+   * @param {LH.Artifacts.NetworkRequest} request
    * @return {LH.Artifacts.NetworkRequest}
    */
-  static findMainDocument(records, finalURL) {
-    // Try to find an exact match with the final URL first if we have one
-    if (finalURL) {
-      // equalWithExcludedFragments is expensive, so check that the finalUrl starts with the request first
-      const mainResource = records.find(request => finalURL.startsWith(request.url) &&
-        URL.equalWithExcludedFragments(request.url, finalURL));
-      if (mainResource) return mainResource;
-      // TODO: beacon !mainResource to Sentry, https://github.com/GoogleChrome/lighthouse/issues/7041
-    }
-
-    const documentRequests = records.filter(record => record.resourceType ===
-        NetworkRequest.TYPES.Document);
-    if (!documentRequests.length) throw new Error('Unable to identify the main resource');
-    // The main document is the earliest document request, using position in networkRecords array to break ties.
-    return documentRequests.reduce((min, r) => (r.startTime < min.startTime ? r : min));
+  static resolveRedirects(request) {
+    while (request.redirectDestination) request = request.redirectDestination;
+    return request;
   }
 }
 
